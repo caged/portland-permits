@@ -4,6 +4,21 @@ import 'normalize.css'
 import './App.css';
 
 class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      permits: []
+    }
+  }
+
+  componentDidMount() {
+    fetch('/permits.json')
+      .then(res => res.json())
+      .then(json => {
+        this.setState({ permits: json })
+      })
+  }
+
   render() {
     return (
       <div className="App">
