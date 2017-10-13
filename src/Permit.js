@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PermitIcon from './PermitIcon';
+import { naiveTitleCaseParagraph } from './utils'
 
 import './Permit.css';
 
@@ -19,7 +20,7 @@ class Permit extends Component {
         <div className="address cell">
           <a href={addressLink}>{ details.address }</a>
         </div>
-        <div className="description cell">{ details.description }</div>
+        <div className="description cell">{ naiveTitleCaseParagraph(details.description) }</div>
         <div className="cell">{ details.neighborhood }</div>
         <div className="date cell">{ details.issued.split(' ')[0] }</div>
       </div>
