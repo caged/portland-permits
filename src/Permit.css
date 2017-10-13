@@ -1,0 +1,30 @@
+.permit-list-header {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.permit-list-header h3 {
+  font-size: 1rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 3fr 1fr;
+  border-bottom: 1px solid #eee;
+}
+
+.cell {
+  padding: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.description {
+  color: #999;
+}

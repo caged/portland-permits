@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
+import './Permit.css';
 
 class Permit extends Component {
   render() {
     const {details, index} = this.props
-    console.log(details);
     return (
-      <div className="permit">
-        <h4>{ details.work }</h4>
-        <div className="description">{ details.description }</div>
+      <div className="row permit">
+        <div className="title cell">{ details.work || details.type || 'N/A' }</div>
+        <div className="address cell">{ details.address }</div>
+        <div className="description cell">{ details.description }</div>
+        <div className="date cell">{ details.issued.split(' ')[0] }</div>
       </div>
     );
   }
