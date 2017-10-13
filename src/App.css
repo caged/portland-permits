@@ -17,3 +17,10 @@ body {
 .logo-image {
   width: 200px;
 }
+
+.permit {
+  float: left;
+  width: 25rem;
+  margin: 10px;
+  border: 1px solid #eee;
+}
