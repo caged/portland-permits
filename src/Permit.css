@@ -37,16 +37,13 @@
   color: #bd4343;
 }
 
-.alteration {
+.alteration,
+.addition {
   color: #555;
 }
 
 .construction {
   color: #46c06f;
-}
-
-.addition {
-  color: #ffb605;
 }
 
 .short-term-rental {

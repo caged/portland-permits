@@ -11,8 +11,8 @@ class PermitIcon extends Component {
       'construction': 'building',
       'alteration': 'wrench',
       'short-term-rental': 'home',
-      'addition': 'plus',
-      'demolition': 'gavel',
+      'addition': 'wrench',
+      'demolition': 'flash',
       'design-review': 'photo',
       'adjustment': 'adjust',
       'right-of-way': 'random',
@@ -39,7 +39,7 @@ class PermitIcon extends Component {
 
     title = title.toLowerCase()
     switch(true) {
-      case /addition/.test(title): cf = 'addition'; break      
+      case /addition/.test(title): cf = 'addition'; break
       case /alteration/.test(title): cf = 'alteration'; break
       case /new construction/.test(title): cf = 'construction'; break
       case /short term rental/.test(title): cf = 'short-term-rental'; break
