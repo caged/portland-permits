@@ -9,7 +9,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: 1fr 1fr 3fr 1fr;
+  grid-template-columns: 0.3fr 1fr 1fr 5fr 1fr 1fr;
   border-bottom: 1px solid #eee;
 }
 
@@ -21,10 +21,38 @@
   text-align: left;
 }
 
+.cell a {
+  color: #333;
+}
+
 .title {
   font-weight: bold;
 }
 
 .description {
   color: #999;
+}
+
+.complaint {
+  color: #bd4343;
+}
+
+.alteration {
+  color: #555;
+}
+
+.construction {
+  color: #46c06f;
+}
+
+.addition {
+  color: #ffb605;
+}
+
+.short-term-rental {
+  color: #25a8db;
+}
+
+.default {
+  color: #333;
 }

@@ -17,7 +17,7 @@ class App extends Component {
     fetch('/permits.json')
       .then(res => res.json())
       .then(json => {
-        this.setState({ permits: json.slice(0, 35) })
+        this.setState({ permits: json.slice(0, 1500) })
       })
   }
 

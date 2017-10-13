@@ -7,5 +7,5 @@ source .env
 DATE_FROM=$(date -v -7d +"%m/%d/%Y")
 DATE_TO=$(date +%Y-%m-%d)
 
-url="https://www.portlandmaps.com/api/permit/?date_type=issued&date_from=$DATE_FROM&date_to=$DATE_TO&format=json&api_key=$PORTLAND_DEV_API_KEY"
+url="https://www.portlandmaps.com/api/permit/?date_type=issued&date_from=$DATE_FROM&date_to=$DATE_TO&sort_field=issued&sort_order=desc&format=json&api_key=$PORTLAND_DEV_API_KEY"
 curl $url
