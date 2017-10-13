@@ -52,6 +52,7 @@ class PermitIcon extends Component {
       case /historic/.test(title): cf = 'historic-review'; break;
       case /zoning/.test(title): cf = 'zoning'; break;
       case /new/.test(title): cf = 'new'; break;
+      default: cf = 'default';
     }
 
     return cf

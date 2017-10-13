@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { sluggify } from './utils'
 import Header from './Header'
 import PermitList from './PermitList'
 
@@ -17,7 +18,16 @@ class App extends Component {
     fetch('/permits.json')
       .then(res => res.json())
       .then(json => {
-        this.setState({ permits: json.slice(0, 1500) })
+        let permits = json.slice(0, 1500).map((v) => {
+          v.nhid = sluggify(v.neighborhood)
+          return v
+        })
+
+        const nhid = this.props.match.params.nhid
+        if(nhid) {
+          permits = permits.filter((p) => { return p.nhid === nhid })
+        }
+        this.setState({ permits: permits })
       })
   }
 
