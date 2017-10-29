@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 import os
+import json
 from urllib.parse import urljoin
 import logging
 from datetime import datetime, timedelta
 import requests
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-from tempfile import NamedTemporaryFile
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -21,7 +21,7 @@ from_date = datetime.now() - timedelta(days=30)
 
 session = requests.Session()
 retries = Retry(total=5,
-                backoff_factor=0.1,
+                backoff_factor=0.5,
                 status_forcelist=[500, 502, 503, 504])
 
 session.mount('https://', HTTPAdapter(max_retries=retries))
@@ -38,13 +38,57 @@ def fetch_permit_data(date_from, date_to=datetime.today().strftime(date_format))
         'api_key': os.environ['PORTLAND_DEV_API_KEY']
     }
 
-    r = session.get(urljoin(api_url, 'permit'), params=params)
-    r.raise_for_status()
-    return r
+    response = session.get(urljoin(api_url, 'permit/'), params=params)
+    response.raise_for_status()
+    return response
+
+
+def fetch_landuse_data(date_from, date_to=datetime.today().strftime(date_format)):
+    params = {
+        'date_from': date_from,
+        'date_to': date_to,
+        'sort_field': 'intake_complete',
+        'sort_order': 'desc',
+        'format': 'json',
+        'api_key': os.environ['PORTLAND_DEV_API_KEY']
+    }
+
+    response = session.get(urljoin(api_url, 'landuse/'), params=params)
+    response.raise_for_status()
+    return response
 
 
 try:
-    t = fetch_permit_data(date_from=from_date.strftime(date_format))
-    print(t.json)
+    permit_response = fetch_permit_data(date_from=from_date.strftime(date_format))
+    landuse_response = fetch_landuse_data(date_from=from_date.strftime(date_format))
 except requests.HTTPError as e:
-    print('failed')
+    logger.error('Failed fetching data. {}'.format(e))
+
+try:
+    permit_json = permit_response.json()
+    landuse_json = landuse_response.json()
+except ValueError as e:
+    logging.error("Failed parsing response json. {}".format(e))
+
+
+if 'error' not in permit_json and 'error' not in landuse_json:
+    total_permits = permit_json['total']
+    total_landuse = landuse_json['total']
+    logging.info('Fetched {} permits and {} landuse reviews'.format(total_permits, total_landuse))
+
+    out_data = []
+    for permit in permit_json['results']:
+        permit['date'] = permit['issued']
+        permit['type'] = 1
+        out_data.append(permit)
+
+    for landuse in landuse_json['results']:
+        landuse['date'] = landuse['intake_complete']
+        landuse['type'] = 2
+        out_data.append(landuse)
+
+    with open('public/data.json', 'w') as f:
+        json.dump(out_data, f)
+else:
+    logging.error('Permit response: {}'.format(permit_json))
+    logging.error('Landuse response: {}'.format(landuse_json))
