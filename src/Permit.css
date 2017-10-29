@@ -39,7 +39,7 @@
 
 .alteration,
 .addition {
-  color: #555;
+  color: #777;
 }
 
 .construction {
@@ -48,6 +48,18 @@
 
 .short-term-rental {
   color: #25a8db;
+}
+
+.demolition {
+  color: #ffb605;
+}
+
+.zoning {
+  color: #7a3aa3;
+}
+
+.right-of-way {
+  color: #f76a3d;
 }
 
 .default {
