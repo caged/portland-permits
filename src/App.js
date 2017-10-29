@@ -15,20 +15,23 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch('/permits.json')
+    fetch('/data.json')
       .then(res => res.json())
       .then(json => {
-        let permits = json.slice(0, 500).map((v) => {
+        let permits = json.filter(p => p.neighborhood !== null && p.ptype === 1)
+        permits = permits.map((v) => {
           v.nhid = sluggify(v.neighborhood)
           return v
         })
 
         const nhid = this.props.match.params.nhid
         if(nhid) {
-          permits = permits.filter((p) => { return p.nhid === nhid })
+          permits = permits.filter((p) => p.nhid === nhid )
         }
+
         this.setState({ permits: permits })
       })
+
   }
 
   render() {

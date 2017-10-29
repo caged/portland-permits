@@ -79,12 +79,12 @@ if 'error' not in permit_json and 'error' not in landuse_json:
     out_data = []
     for permit in permit_json['results']:
         permit['date'] = permit['issued']
-        permit['type'] = 1
+        permit['ptype'] = 1
         out_data.append(permit)
 
     for landuse in landuse_json['results']:
         landuse['date'] = landuse['intake_complete']
-        landuse['type'] = 2
+        landuse['ptype'] = 2
         out_data.append(landuse)
 
     with open('public/data.json', 'w') as f:

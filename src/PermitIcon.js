@@ -34,7 +34,6 @@ class PermitIcon extends Component {
 
   static getNormalizedClassificationForTitle(title) {
     let cf = 'default'
-
     if(!title) return cf
 
     title = title.toLowerCase()
