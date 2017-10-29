@@ -18,7 +18,7 @@ class App extends Component {
     fetch('/permits.json')
       .then(res => res.json())
       .then(json => {
-        let permits = json.slice(0, 1500).map((v) => {
+        let permits = json.slice(0, 500).map((v) => {
           v.nhid = sluggify(v.neighborhood)
           return v
         })
