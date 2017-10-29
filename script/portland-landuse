@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+source .env
+
+DATE_FROM=$(date -v -30d +"%m/%d/%Y")
+DATE_TO=$(date +%Y-%m-%d)
+
+curl --get \
+  --data-urlencode "date_from=$DATE_FROM" \
+  --data-urlencode "date_to=$DATE_TO" \
+  --data-urlencode "sort_field=intake_complete" \
+  --data-urlencode "sort_order=desc" \
+  --data-urlencode "format=json" \
+  --data-urlencode "api_key=$PORTLAND_DEV_API_KEY" \
+  "https://www.portlandmaps.com/api/landuse/"
