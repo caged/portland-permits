@@ -3,6 +3,7 @@
 import os
 import json
 import math
+import re
 from urllib.parse import urljoin
 import logging
 from datetime import datetime, timedelta
@@ -22,6 +23,12 @@ api_url = 'https://www.portlandmaps.com/api/'
 from_date = (datetime.now() - timedelta(days=30)).strftime(date_format)
 to_date = datetime.today().strftime(date_format)
 per_page = 1000
+exclude_keys = ['neighborhood_coalition',
+                'business_association',
+                'ccb_number',
+                'application_number',
+                'state_id']
+
 from_projection = Proj(init='epsg:3857')
 to_projection = Proj(init='epsg:4326')
 
@@ -90,17 +97,33 @@ def transform_xy(permit):
         x, y = transform(from_projection, to_projection, cur_x, cur_y)
         permit['x'] = x
         permit['y'] = y
+
+
+def format_neighborhood(permit):
+    if permit['neighborhood']:
+        name = permit['neighborhood']
+        removed_na = re.sub(r"(community|neighborhood)? association", '', name, flags=re.IGNORECASE)
+        removed_na = removed_na.replace('Neighborhood District (HAND)', '')
+        removed_na = removed_na.replace('Foothills League', '')
+        removed_na = removed_na.replace('Improvement League (SMILE)', '')
+        stripped_nh = removed_na.strip()
+        permit['neighborhood'] = stripped_nh
+
+
 out_data = []
 for permits in fetch_all_permits():
-    for permit in data:
+    for permit in permits:
         permit_date = permit['final'] or permit['issued'] or permit['under_review']
         real_date = datetime.strptime(permit_date, '%Y-%m-%d %H:%M:%S')
+        [permit.pop(key) for key in exclude_keys]
         transform_xy(permit)
+        format_neighborhood(permit)
         out_data.append(permit)
 
+out_data = sorted(out_data, key=lambda k: k['ivr_number'])
 
-# with open('test.json', 'w') as f:
-#     json.dump(permit_data, f)
+with open('test.json', 'w') as f:
+    json.dump(out_data, f)
 
 
 # def fetch_permit_data(date_from, date_to=datetime.today().strftime(date_format), params={}):
