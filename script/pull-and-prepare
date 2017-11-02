@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import requests
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
+from pyproj import Proj, transform
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -21,6 +22,8 @@ api_url = 'https://www.portlandmaps.com/api/'
 from_date = (datetime.now() - timedelta(days=30)).strftime(date_format)
 to_date = datetime.today().strftime(date_format)
 per_page = 1000
+from_projection = Proj(init='epsg:3857')
+to_projection = Proj(init='epsg:4326')
 
 session = requests.Session()
 retries = Retry(total=5,
@@ -78,11 +81,21 @@ def fetch_all_permits():
             logging.error("Failed parsing response json. {}".format(e))
 
 
+# The data from Portland is in EPSG:3857 (Web Mercator), and we want to transform it into a format
+# that's easier to work with on the web in EPSG:4236.
+def transform_xy(permit):
+    cur_x = permit.pop('x_web_mercator')
+    cur_y = permit.pop('y_web_mercator')
+    if cur_x and cur_y:
+        x, y = transform(from_projection, to_projection, cur_x, cur_y)
+        permit['x'] = x
+        permit['y'] = y
 out_data = []
 for permits in fetch_all_permits():
     for permit in data:
         permit_date = permit['final'] or permit['issued'] or permit['under_review']
         real_date = datetime.strptime(permit_date, '%Y-%m-%d %H:%M:%S')
+        transform_xy(permit)
         out_data.append(permit)
 
 
