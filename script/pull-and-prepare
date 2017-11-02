@@ -6,7 +6,7 @@ import math
 import re
 from urllib.parse import urljoin
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import requests
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
@@ -18,10 +18,10 @@ logging.basicConfig(
     filename='portland-permits.log',
     level=logging.DEBUG)
 
+lag_days = 7
 date_format = '%m/%d/%Y'
 api_url = 'https://www.portlandmaps.com/api/'
-from_date = (datetime.now() - timedelta(days=30)).strftime(date_format)
-to_date = datetime.today().strftime(date_format)
+from_date = datetime.now() - timedelta(days=lag_days)
 per_page = 1000
 exclude_keys = ['neighborhood_coalition',
                 'business_association',
@@ -40,9 +40,18 @@ retries = Retry(total=5,
 session.mount('https://', HTTPAdapter(max_retries=retries))
 
 
+def serialize_json_with_dates(obj):
+    if isinstance(obj, datetime):
+        return str(obj.date())
+    if isinstance(obj, date):
+        return str(obj)
+
+    raise TypeError('Type {} is not serializable'.format(type(obj)))
+
+
 def fetch_permits(query={}):
     date_format = '%m/%d/%Y'
-    from_date = (datetime.now() - timedelta(days=30)).strftime(date_format)
+    from_date = (datetime.now() - timedelta(days=lag_days)).strftime(date_format)
     to_date = datetime.today().strftime(date_format)
     defaults = {
         'date_from': from_date,
@@ -99,6 +108,7 @@ def transform_xy(permit):
         permit['y'] = y
 
 
+# Shorten neighborhod names from long names to their more commonly referenced short names.
 def format_neighborhood(permit):
     if permit['neighborhood']:
         name = permit['neighborhood']
@@ -110,71 +120,31 @@ def format_neighborhood(permit):
         permit['neighborhood'] = stripped_nh
 
 
+def extract_date(permit):
+    permit_date = permit['final'] or permit['issued'] or permit['under_review']
+    real_date = datetime.strptime(permit_date, '%Y-%m-%d %H:%M:%S')
+    permit['date'] = real_date
+
+
 out_data = []
 for permits in fetch_all_permits():
     for permit in permits:
-        permit_date = permit['final'] or permit['issued'] or permit['under_review']
-        real_date = datetime.strptime(permit_date, '%Y-%m-%d %H:%M:%S')
+        try:
+            extract_date(permit)
+        except Exception as e:
+            continue
+
+        # For some reason the date ended up being before the cut off.  Usually due to an
+        # poor date in the form of an incorrect 'final' date.
+        if permit['date'] < from_date:
+            continue
+
         [permit.pop(key) for key in exclude_keys]
         transform_xy(permit)
         format_neighborhood(permit)
         out_data.append(permit)
 
-out_data = sorted(out_data, key=lambda k: k['ivr_number'])
+out_data = sorted(out_data, key=lambda k: k['date'], reverse=True)
 
-with open('test.json', 'w') as f:
-    json.dump(out_data, f)
-
-
-# def fetch_permit_data(date_from, date_to=datetime.today().strftime(date_format), params={}):
-#     defaults = {
-#         'date_from': date_from,
-#         'date_to': date_to,
-#         'sort_field': 'issued',
-#         'sort_order': 'desc',
-#         'format': 'json',
-#         'api_key': os.environ['PORTLAND_DEV_API_KEY']
-#     }
-#
-#     context = {**defaults, **params}
-#     logger.debug(context)
-#     response = session.get(urljoin(api_url, 'permit/'), params=context)
-#     response.raise_for_status()
-#     return response
-#
-#
-# out_data = []
-# all_json = []
-# page = 1
-#
-# while True:
-#     try:
-#         permit_response = fetch_permit_data(
-#             date_from=from_date,
-#             date_to=to_date,
-#             params={'sort_field': 'application_number'})
-#     except requests.HTTPError as e:
-#         logger.error('Failed fetching data. {}'.format(e))
-#
-#     try:
-#         permit_json = permit_response.json()
-#     except ValueError as e:
-#         logging.error("Failed parsing response json. {}".format(e))
-#
-#     if 'error' not in permit_json:
-#         all_json.append(permit_json)
-#         total_results = permit_json['total']
-#         total_pages = math.ceil(total_results / page_page)
-
-#     total_permits = permit_json['total']
-#     logging.info('Fetched {} permits'.format(total_permits))
-#
-#     for permit in permit_json['results']:
-#         permit['date'] = permit['issued'] or permit['under_review']
-#         permit['ptype'] = 1
-#         out_data.append(permit)
-#
-#     with open('public/data.json', 'w') as f:
-#         json.dump(out_data, f)
-# else:
-#     logging.error('Permit response: {}'.format(permit_json))
+with open('public/data.json', 'w') as f:
+    json.dump(out_data, f, default=serialize_json_with_dates)
