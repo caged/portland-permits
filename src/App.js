@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { sluggify } from './utils'
 import Header from './Header'
-import PermitList from './PermitList'
+import DateGroupedList from './DateGroupedList'
 
 import 'normalize.css'
 import './App.css';
@@ -18,8 +18,8 @@ class App extends Component {
     fetch('/data.json')
       .then(res => res.json())
       .then(json => {
-        let permits = json.filter(p => p.neighborhood !== null && p.ptype === 1)
-        permits = permits.map((v) => {
+        // let permits = json.filter(p => p.neighborhood !== null )
+        let permits = json.map((v) => {
           v.nhid = sluggify(v.neighborhood)
           return v
         })
@@ -38,7 +38,7 @@ class App extends Component {
     return (
       <div className="App">
         <Header />
-        <PermitList permits={this.state.permits} />
+        <DateGroupedList permits={this.state.permits} />
       </div>
     );
   }

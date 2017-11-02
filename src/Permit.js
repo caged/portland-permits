@@ -21,14 +21,14 @@ class Permit extends Component {
           <a href={addressLink}>{ details.address }</a>
         </div>
         <div className="description cell">
-            { naiveTitleCaseParagraph(details.description) }
+            { details.ivr_number } { naiveTitleCaseParagraph(details.description) }
         </div>
         <div className="cell">
           <Link to={linkPath}>
             { shortName(details.neighborhood) }
           </Link>
         </div>
-        <div className="date cell">{ details.issued.split(' ')[0] }</div>
+        <div className="date cell">{ details.date.split(' ')[0] }</div>
       </div>
     );
   }

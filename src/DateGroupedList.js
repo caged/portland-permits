@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Permit from './Permit'
 
-class PermitList extends Component {
+class DateGroupedList extends Component {
   render() {
     return (
       <div className="permit-list">
@@ -18,4 +18,4 @@ class PermitList extends Component {
   }
 }
 
-export default PermitList;
+export default DateGroupedList;
