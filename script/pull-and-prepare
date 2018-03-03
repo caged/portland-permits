@@ -129,6 +129,11 @@ def extract_date(permit):
 out_data = []
 for permits in fetch_all_permits():
     for permit in permits:
+
+        work = permit['work'] or permit['type']
+        if work and 'addition' in work.lower():
+            continue
+
         try:
             extract_date(permit)
         except Exception as e:
