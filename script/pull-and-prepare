@@ -118,7 +118,7 @@ def format_neighborhood(permit):
         permit['neighborhood'] = stripped_nh
 
 
-def extract_date(permit):
+def set_normalized_date(permit):
     permit_date = permit['final'] or permit['issued'] or permit['under_review']
     real_date = datetime.strptime(permit_date, '%Y-%m-%d %H:%M:%S')
     permit['date'] = real_date
@@ -133,7 +133,7 @@ for permits in fetch_all_permits():
             continue
 
         try:
-            extract_date(permit)
+            set_normalized_date(permit)
         except Exception as e:
             continue
 
