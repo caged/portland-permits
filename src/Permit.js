@@ -8,23 +8,29 @@ import './Permit.css';
 class Permit extends Component {
   render() {
     const {details} = this.props
-    const title = details.work || details.type
+    const title = details.work || details.type || 'N/A'
     const category = PermitIcon.getNormalizedClassificationForTitle(title)
     const titleClasses = `title cell ${category}`
     const addressLink = `https://maps.google.com/?q=${details.address}`
-    const linkPath = `/neighborhood/${details.nhid}`
+    const nhPath = `/neighborhood/${details.nhid}`
+    const typePath = `/type/${details.tid}`
+
     return (
       <div className="row permit">
         <div className="cell"><PermitIcon title={title} /></div>
-        <div className={titleClasses}>{ details.work || details.type || 'N/A' }</div>
+        <div className={titleClasses}>
+          <Link to={typePath}>
+            { title }
+          </Link>
+        </div>
         <div className="address cell">
           <a href={addressLink}>{ details.address }</a>
         </div>
         <div className="description cell">
-            { details.ivr_number } { naiveTitleCaseParagraph(details.description) }
+            { details.ccb_number } { naiveTitleCaseParagraph(details.description) }
         </div>
         <div className="cell">
-          <Link to={linkPath}>
+          <Link to={nhPath}>
             { shortName(details.neighborhood) }
           </Link>
         </div>

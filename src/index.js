@@ -12,6 +12,7 @@ const Root = () => {
       <div>
         <Route exact path="/" component={App}/>
         <Route path="/neighborhood/:nhid" component={App}/>
+        <Route path="/type/:tid" component={App}/>
       </div>
     </BrowserRouter>
   )
