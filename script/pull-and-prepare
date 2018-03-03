@@ -18,7 +18,7 @@ logging.basicConfig(
     filename='portland-permits.log',
     level=logging.DEBUG)
 
-lag_days = 7
+lag_days = 21
 date_format = '%m/%d/%Y'
 api_url = 'https://www.portlandmaps.com/api/'
 from_date = datetime.now() - timedelta(days=lag_days)
