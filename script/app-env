@@ -1,0 +1,11 @@
+#!/bin/sh
+# Run a command in the app's development environment.
+
+set -e
+
+appdir=$(cd $(dirname "$0")/.. && pwd)
+[ -f /etc/inside-container ] && exec "$@"
+
+cmd="$@"; [ "$#" -eq 0 ] && cmd=bash
+
+exec docker run -p 3000:3000 --env-file=.env -it -v "$appdir:/app" portland-permits $cmd

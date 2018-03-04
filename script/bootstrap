@@ -1,3 +1,9 @@
 #!/bin/bash
 
-pipenv install
+# pipenv install
+
+set -e
+
+appdir=$(cd $(dirname "$0")/.. && pwd)
+
+cd "$appdir" && docker build -t portland-permits .
